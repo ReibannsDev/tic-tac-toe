@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+:root {
+  --paper-cream: #f4f0e6;
+  --paper-dot: #c1baa9;
+  --desk-bg: #cfc7b8;
+  --ink-dark: #24201b;
+}
+
+body {
+  background-color: var(--desk-bg);
+  background-image: radial-gradient(
+    ellipse at 50% 25%,
+    #ddd6c8 0%,
+    #cbc2b2 65%,
+    #bdb3a2 100%
+  );
+  color: var(--ink-dark);
+  min-height: 100dvh;
+}
+
+/* Dotted notebook paper base color */
+.paper-sheet {
+  background-color: var(--paper-cream);
+}
+
+.paper-dots {
+  background-image: radial-gradient(circle, #bfb7a6 1px, transparent 1.1px);
+  background-size: 18px 18px;
+}
+
+/* Hand-drawn SVG stroke reveal animations */
+@keyframes drawStroke {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-draw-stroke {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: drawStroke 190ms cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+
+.animate-draw-stroke-delay {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: drawStroke 190ms cubic-bezier(0.25, 0.8, 0.25, 1) 115ms forwards;
+}
+
+.animate-draw-stroke-o {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: drawStroke 270ms cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+
+.animate-draw-strike {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: drawStroke 340ms cubic-bezier(0.22, 1, 0.36, 1) 120ms forwards;
+}
