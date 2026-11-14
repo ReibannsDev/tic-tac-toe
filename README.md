@@ -2,7 +2,7 @@
 
 A two-player tic-tac-toe game drawn on a dotted notebook sheet: 35 hand-drawn grids, ink marks that draw themselves with real pen sounds, and a running scoreboard.
 
-**Live app:** https://tic-tac-toe-mango-cad6.vercel.app
+**Live app:** https://tic-tac-toe-ivory-alpha-45.vercel.app
 
 <!-- Add a screenshot at docs/screenshot.png and uncomment:
 ![Paper Tic-Tac-Toe](docs/screenshot.png)
