@@ -14,10 +14,20 @@ const caveat = Caveat({
   variable: '--font-hand-display',
 });
 
+const siteUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : 'http://localhost:3000';
+
+const title = 'Paper Tic-Tac-Toe — 35 Hand-Drawn Grids';
+const description =
+  'A dotted notebook paper tic-tac-toe experience with 35 hand-drawn grids, zoom-to-center play, and live score tracking.';
+
 export const metadata: Metadata = {
-  title: 'Paper Tic-Tac-Toe — 35 Hand-Drawn Grids',
-  description:
-    'A dotted notebook paper tic-tac-toe experience with 35 hand-drawn grids, zoom-to-center play, and live score tracking.',
+  metadataBase: new URL(siteUrl),
+  title,
+  description,
+  openGraph: { title, description, type: 'website' },
+  twitter: { card: 'summary_large_image', title, description },
 };
 
 export default function RootLayout({
