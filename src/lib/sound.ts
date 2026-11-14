@@ -318,7 +318,6 @@ export function playZoomIn(enabled: boolean): void {
   if (!ctx) return;
 
   playSoftTick(ctx, { freqStart: 420, freqEnd: 640, duration: 0.055, gainPeak: 0.075 });
-  playSample(ctx, 'x2', { gain: 0.28, playbackRate: 1.45 });
 }
 
 /** Soft downward paper-settle tap when returning to the sheet. */
@@ -328,7 +327,6 @@ export function playZoomOut(enabled: boolean): void {
   if (!ctx) return;
 
   playSoftTick(ctx, { freqStart: 520, freqEnd: 310, duration: 0.06, gainPeak: 0.07 });
-  playSample(ctx, 'x1', { gain: 0.22, playbackRate: 1.2 });
 }
 
 /** Soft low-mid cardstock turn when starting a fresh sheet. */
