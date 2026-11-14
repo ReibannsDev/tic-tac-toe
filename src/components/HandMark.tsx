@@ -6,7 +6,6 @@ interface HandMarkProps {
   player: Player;
   gridId: number;
   cellIndex: number;
-  pageNumber?: number;
   animated?: boolean;
   ghost?: boolean;
   strokeWidth?: number;
@@ -21,7 +20,6 @@ export function HandMark({
   player,
   gridId,
   cellIndex,
-  pageNumber = 1,
   animated = false,
   ghost = false,
   strokeWidth = 6.5,
@@ -29,7 +27,7 @@ export function HandMark({
   const color = INK_COLORS[player];
 
   if (player === 'X') {
-    const [stroke1, stroke2] = getHandXPaths(gridId, cellIndex, pageNumber);
+    const [stroke1, stroke2] = getHandXPaths(gridId, cellIndex);
     return (
       <svg
         viewBox="0 0 100 100"
@@ -60,7 +58,7 @@ export function HandMark({
     );
   }
 
-  const oPath = getHandOPath(gridId, cellIndex, pageNumber);
+  const oPath = getHandOPath(gridId, cellIndex);
   return (
     <svg
       viewBox="0 0 100 100"

@@ -7,7 +7,6 @@ import { HandMark, INK_COLORS } from './HandMark';
 
 interface TicTacToeBoardProps {
   grid: GridState;
-  pageNumber?: number;
   interactive?: boolean;
   nextTurn?: Player;
   lastPlayedCell?: number | null;
@@ -18,7 +17,6 @@ interface TicTacToeBoardProps {
 
 export function TicTacToeBoard({
   grid,
-  pageNumber = 1,
   interactive = false,
   nextTurn = 'X',
   lastPlayedCell = null,
@@ -27,14 +25,14 @@ export function TicTacToeBoard({
   sizeVariant = 'mini',
 }: TicTacToeBoardProps) {
   const geometry = useMemo(
-    () => getHandGridGeometry(grid.id, pageNumber),
-    [grid.id, pageNumber]
+    () => getHandGridGeometry(grid.id),
+    [grid.id]
   );
 
   const strikePath = useMemo(() => {
     if (!grid.winLine) return null;
-    return getWinStrikePath(grid.winLine, grid.id, pageNumber);
-  }, [grid.winLine, grid.id, pageNumber]);
+    return getWinStrikePath(grid.winLine, grid.id);
+  }, [grid.winLine, grid.id]);
 
   const isFinished = Boolean(grid.winner || grid.isDraw);
   const gridStrokeWidth = sizeVariant === 'focused' ? 2.4 : 2.8;
@@ -90,7 +88,6 @@ export function TicTacToeBoard({
                     player={cell}
                     gridId={grid.id}
                     cellIndex={idx}
-                    pageNumber={pageNumber}
                     animated={shouldAnimateMark}
                     strokeWidth={markStrokeWidth}
                   />
@@ -100,7 +97,6 @@ export function TicTacToeBoard({
                       player={nextTurn}
                       gridId={grid.id}
                       cellIndex={idx}
-                      pageNumber={pageNumber}
                       ghost
                       strokeWidth={markStrokeWidth}
                     />
@@ -117,7 +113,6 @@ export function TicTacToeBoard({
                   player={cell}
                   gridId={grid.id}
                   cellIndex={idx}
-                  pageNumber={pageNumber}
                   strokeWidth={markStrokeWidth}
                 />
               ) : null}

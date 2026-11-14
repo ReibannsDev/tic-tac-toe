@@ -62,3 +62,107 @@ body {
   stroke-dashoffset: 1;
   animation: drawStroke 340ms cubic-bezier(0.22, 1, 0.36, 1) 120ms forwards;
 }
+
+/* Quick, light post-round animations */
+@keyframes resultPop {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.7;
+  }
+  55% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes winCardPulse {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.018);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes drawWobble {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate3d(-4px, 0, 0) rotate(-0.6deg);
+  }
+  55% {
+    transform: translate3d(4px, 0, 0) rotate(0.6deg);
+  }
+  80% {
+    transform: translate3d(-2px, 0, 0) rotate(-0.25deg);
+  }
+}
+
+@keyframes inkSparkBurst {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.35) rotate(0deg);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate3d(var(--tx, 0px), var(--ty, -18px), 0) scale(1.05) rotate(var(--rot, 18deg));
+    opacity: 0;
+  }
+}
+
+@keyframes cardSwapIn {
+  0% {
+    transform: scale(0.94);
+    opacity: 0.35;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-result-pop {
+  animation: resultPop 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-win-card {
+  animation: winCardPulse 360ms cubic-bezier(0.22, 1, 0.36, 1) 180ms both;
+}
+
+.animate-draw-wobble {
+  animation: drawWobble 360ms cubic-bezier(0.36, 0.07, 0.19, 0.97) 120ms both;
+}
+
+.animate-ink-spark {
+  animation: inkSparkBurst 580ms cubic-bezier(0.16, 1, 0.3, 1) var(--delay, 160ms) both;
+}
+
+.animate-card-swap {
+  animation: cardSwapIn 200ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-draw-stroke,
+  .animate-draw-stroke-delay,
+  .animate-draw-stroke-o,
+  .animate-draw-strike,
+  .animate-result-pop,
+  .animate-win-card,
+  .animate-draw-wobble,
+  .animate-ink-spark,
+  .animate-card-swap {
+    animation: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+}

@@ -34,3 +34,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# source audio (the app uses the trimmed clips in public/sounds)
+*.mp3

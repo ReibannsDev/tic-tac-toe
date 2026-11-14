@@ -27,8 +27,8 @@ export interface HandGridGeometry {
  * Generates 4 quadratic Bezier paths (2 vertical, 2 horizontal) in a 0..100 viewBox
  * mirroring the loose, slightly bowed pen strokes from the reference notebook photo.
  */
-export function getHandGridGeometry(gridId: number, pageNumber: number = 1): HandGridGeometry {
-  const rand = mulberry32((pageNumber * 1009 + gridId * 7919 + 31) >>> 0);
+export function getHandGridGeometry(gridId: number): HandGridGeometry {
+  const rand = mulberry32((1009 + gridId * 7919 + 31) >>> 0);
 
   // Inner grid line positions roughly around 34 and 66
   const vx1 = jitter(rand, 34, 2.8);
@@ -72,8 +72,8 @@ export function getHandGridGeometry(gridId: number, pageNumber: number = 1): Han
 /**
  * Generates two slightly curved pen strokes for an 'X' in a 0..100 cell viewBox.
  */
-export function getHandXPaths(gridId: number, cellIndex: number, pageNumber: number = 1): [string, string] {
-  const rand = mulberry32((pageNumber * 3571 + gridId * 997 + cellIndex * 131 + 17) >>> 0);
+export function getHandXPaths(gridId: number, cellIndex: number): [string, string] {
+  const rand = mulberry32((3571 + gridId * 997 + cellIndex * 131 + 17) >>> 0);
 
   // Stroke 1: top-left to bottom-right
   const x1a = jitter(rand, 23, 4);
@@ -101,8 +101,8 @@ export function getHandXPaths(gridId: number, cellIndex: number, pageNumber: num
  * Generates a natural pen-drawn 'O' loop in a 0..100 cell viewBox.
  * Uses a multi-point closed-ish smooth curve with subtle radius & join imperfection.
  */
-export function getHandOPath(gridId: number, cellIndex: number, pageNumber: number = 1): string {
-  const rand = mulberry32((pageNumber * 4219 + gridId * 1223 + cellIndex * 197 + 53) >>> 0);
+export function getHandOPath(gridId: number, cellIndex: number): string {
+  const rand = mulberry32((4219 + gridId * 1223 + cellIndex * 197 + 53) >>> 0);
 
   const cx = jitter(rand, 50, 2.5);
   const cy = jitter(rand, 50, 2.5);
@@ -157,10 +157,9 @@ const CELL_CENTERS: ReadonlyArray<{ x: number; y: number }> = [
  */
 export function getWinStrikePath(
   line: [number, number, number],
-  gridId: number,
-  pageNumber: number = 1
+  gridId: number
 ): string {
-  const rand = mulberry32((pageNumber * 6133 + gridId * 1499 + 91) >>> 0);
+  const rand = mulberry32((6133 + gridId * 1499 + 91) >>> 0);
   const start = CELL_CENTERS[line[0]];
   const end = CELL_CENTERS[line[2]];
 
