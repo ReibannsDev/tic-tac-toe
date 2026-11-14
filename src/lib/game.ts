@@ -61,10 +61,7 @@ export function countMoves(board: CellValue[]): number {
 
 export function getNextTurn(grid: GridState): Player {
   const moves = countMoves(grid.board);
-  if (moves % 2 === 0) {
-    return grid.startingPlayer;
-  }
-  return grid.startingPlayer === 'X' ? 'O' : 'X';
+  return moves % 2 === 0 ? grid.startingPlayer : otherPlayer(grid.startingPlayer);
 }
 
 export function getGridStatus(grid: GridState): GridStatus {
@@ -72,6 +69,47 @@ export function getGridStatus(grid: GridState): GridStatus {
   if (grid.isDraw) return 'draw';
   if (countMoves(grid.board) > 0) return 'playing';
   return 'empty';
+}
+
+export type MoveOutcome = 'continue' | 'win' | 'draw';
+
+export interface MoveResult {
+  grid: GridState;
+  player: Player;
+  outcome: MoveOutcome;
+}
+
+/**
+ * Places the next player's mark in `cellIndex`. Returns null when the move is
+ * not allowed (grid finished, cell taken, or index out of range).
+ */
+export function applyMove(grid: GridState, cellIndex: number): MoveResult | null {
+  if (grid.winner || grid.isDraw) return null;
+  if (!Number.isInteger(cellIndex) || cellIndex < 0 || cellIndex > 8) return null;
+  if (grid.board[cellIndex] !== null) return null;
+
+  const player = getNextTurn(grid);
+  const board = [...grid.board];
+  board[cellIndex] = player;
+
+  const win = checkWinner(board);
+  const isDraw = !win && isBoardFull(board);
+
+  return {
+    grid: {
+      ...grid,
+      board,
+      winner: win ? win.winner : null,
+      winLine: win ? win.line : null,
+      isDraw,
+    },
+    player,
+    outcome: win ? 'win' : isDraw ? 'draw' : 'continue',
+  };
+}
+
+export function otherPlayer(player: Player): Player {
+  return player === 'X' ? 'O' : 'X';
 }
 
 export function createEmptyGrid(id: number, startingPlayer: Player = 'X'): GridState {
