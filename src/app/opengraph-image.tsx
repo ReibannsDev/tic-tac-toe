@@ -68,7 +68,7 @@ export default function OpengraphImage() {
       >
         <div style={{ fontSize: 96, fontWeight: 700, letterSpacing: -1 }}>Tic-Tac-Toe</div>
         <div style={{ fontSize: 36, color: '#574f43', marginTop: 12 }}>
-          35 hand-drawn grids on a notebook sheet
+          Hand-drawn grids on a notebook sheet
         </div>
         <div style={{ display: 'flex', gap: 40, marginTop: 60 }}>
           {BOARDS.map((board, i) => (

@@ -1,6 +1,6 @@
 # Paper Tic-Tac-Toe
 
-A two-player tic-tac-toe game drawn on a dotted notebook sheet: 35 hand-drawn grids, ink marks that draw themselves with real pen sounds, and a running scoreboard.
+A two-player tic-tac-toe game drawn on a dotted notebook sheet: a page of hand-drawn grids, ink marks that draw themselves with real pen sounds, and a running scoreboard.
 
 **Live app:** https://tic-tac-toe-ivory-alpha-45.vercel.app
 
@@ -13,7 +13,7 @@ A two-player tic-tac-toe game drawn on a dotted notebook sheet: 35 hand-drawn gr
 1. Tap any grid on the sheet to zoom in on it.
 2. Players take turns placing **X** and **O**. The banner shows whose turn it is, then who won or that it's a draw.
 3. When a round ends, choose **Next empty grid →** to start a new game, or go back to the sheet.
-4. **New Sheet** clears all 35 grids for a fresh start. The scoreboard keeps counting wins and draws until you press **Reset score**.
+4. **New Sheet** clears every grid for a fresh start. The scoreboard keeps counting wins and draws until you press **Reset score**.
 
 Who starts alternates after every finished round, so neither player always gets the first move. Everything is saved in your browser, so a reload picks up where you left off.
 
@@ -47,7 +47,7 @@ npm works too (`npm install`, `npm run dev`).
 src/
   app/                    layout, page, favicon and share image
   components/
-    NotebookGame.tsx      the sheet: header, grid of 35 boards, dialogs
+    NotebookGame.tsx      the sheet: header, page of boards, dialogs
     FocusedGridOverlay.tsx  zoomed-in playable board (FLIP animation, focus trap)
     TicTacToeBoard.tsx    one board, mini or focused
     HandMark.tsx          hand-drawn X / O
