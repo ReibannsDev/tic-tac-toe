@@ -18,9 +18,9 @@ const siteUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
   ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
   : 'http://localhost:3000';
 
-const title = 'Paper Tic-Tac-Toe — 35 Hand-Drawn Grids';
+const title = 'Paper Tic-Tac-Toe';
 const description =
-  'A dotted notebook paper tic-tac-toe experience with 35 hand-drawn grids, zoom-to-center play, and live score tracking.';
+  'A dotted notebook paper tic-tac-toe experience, zoom-to-center play, and live score tracking.';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
