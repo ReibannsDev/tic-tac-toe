@@ -389,7 +389,7 @@ export function FocusedGridOverlay({
           aria-hidden="true"
         >
           <div className="flex items-center gap-2.5 text-lg font-semibold tracking-wide sm:text-xl">
-            <span className="text-sm text-[#7a7164]">#{grid.id + 1}</span>
+            <span className="text-sm text-[#6b6255]">#{grid.id + 1}</span>
             <span className="text-[#c5bdb0]">•</span>
             {grid.winner ? (
               <span style={{ color: INK_COLORS[grid.winner] }}>
@@ -453,13 +453,9 @@ export function FocusedGridOverlay({
           type="button"
           data-primary-action={nextEmptyGridId === null || !isFinished ? '' : undefined}
           onClick={() => !isClosing && onRequestClose()}
-          className="paper-sheet pointer-events-auto cursor-pointer rounded-full border border-[#c7beae] px-5 py-1.5 text-base font-medium text-[#3b352c] shadow-sm transition hover:-translate-y-0.5 hover:border-[#8f8574] hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#faf7f0] active:translate-y-0"
+          className="paper-sheet pointer-events-auto cursor-pointer rounded-full border border-[#8e8474] px-5 py-1.5 text-base font-medium text-[#3b352c] shadow-sm transition hover:-translate-y-0.5 hover:border-[#5c5346] hover:shadow-md focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#faf7f0] active:translate-y-0"
         >
-          {isFinished
-            ? nextEmptyGridId !== null
-              ? 'Back to page'
-              : 'Click outside or tap to return'
-            : 'Pause & back to page'}
+          {isFinished ? 'Back to page' : 'Pause & back to page'}
         </button>
 
         {isFinished && nextEmptyGridId !== null && (
@@ -467,7 +463,7 @@ export function FocusedGridOverlay({
             type="button"
             data-primary-action=""
             onClick={() => !isClosing && onNextEmptyGrid()}
-            className="pointer-events-auto cursor-pointer rounded-full border border-[#24201b] bg-[#24201b] px-5 py-1.5 text-base font-medium text-[#f8f5ec] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#38322a] hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#faf7f0] active:translate-y-0"
+            className="pointer-events-auto cursor-pointer rounded-full border border-[#24201b] bg-[#24201b] px-5 py-1.5 text-base font-medium text-[#f8f5ec] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#38322a] hover:shadow-md focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#faf7f0] active:translate-y-0"
           >
             Next empty grid (#{nextEmptyGridId + 1}) →
           </button>

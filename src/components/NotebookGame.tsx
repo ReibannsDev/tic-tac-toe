@@ -253,7 +253,7 @@ export function NotebookGame() {
                   Tic-Tac-Toe
                 </h1>
                 <p className="mt-1.5 text-sm text-[#574f43] sm:text-base">
-                  Tap any grid to zoom in &amp; play. Click outside anytime to return.
+                  Tap any grid to zoom in &amp; play. Tap outside it anytime to return.
                 </p>
               </div>
 
@@ -273,7 +273,7 @@ export function NotebookGame() {
                   aria-pressed={soundEnabled}
                   aria-label="Sound effects"
                   title={soundEnabled ? 'Sound on' : 'Sound muted'}
-                  className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-[#c7beae] bg-[#f8f5ec] px-2.5 py-1 text-sm text-[#4a4338] shadow-xs transition hover:-translate-y-0.5 hover:border-[#8e8474] hover:text-[#24201b] active:translate-y-0 sm:px-3"
+                  className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-[#8e8474] bg-[#f8f5ec] px-2.5 py-1 text-sm text-[#4a4338] shadow-xs transition hover:-translate-y-0.5 hover:border-[#5c5346] hover:text-[#24201b] active:translate-y-0 sm:px-3"
                 >
                   <SoundIcon muted={!soundEnabled} />
                   <span className="hidden sm:inline">{soundEnabled ? 'Sound' : 'Muted'}</span>
@@ -318,7 +318,7 @@ export function NotebookGame() {
                         {...{ [ROVING_ATTR]: grid.id }}
                         onClick={() => handleSelectGrid(grid.id)}
                         aria-label={describeGrid(grid)}
-                        className={`group relative block w-full scroll-mt-32 rounded-lg p-1 transition-[transform,background-color] duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1c2b4a]/50 sm:p-1.5 ${
+                        className={`group relative block w-full scroll-mt-32 rounded-lg p-1 transition-[transform,background-color] duration-150 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#1c2b4a]/50 sm:p-1.5 ${
                           isFocused
                             ? 'pointer-events-none'
                             : 'cursor-pointer hover:scale-[1.07] hover:bg-[#24201b]/[0.04] active:scale-[0.98]'

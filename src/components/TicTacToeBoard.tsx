@@ -49,7 +49,7 @@ export function TicTacToeBoard({
       {/* Hand-drawn # grid lines */}
       <svg
         viewBox="0 0 100 100"
-        className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
+        className="pointer-events-none absolute inset-0 h-full w-full overflow-visible text-[#24201b]"
         aria-hidden="true"
       >
         {geometry.lines.map((d, idx) => (
@@ -57,7 +57,7 @@ export function TicTacToeBoard({
             key={idx}
             d={d}
             fill="none"
-            stroke="#24201b"
+            stroke="currentColor"
             strokeWidth={gridStrokeWidth}
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -97,12 +97,13 @@ export function TicTacToeBoard({
         <svg
           viewBox="0 0 100 100"
           className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
+          style={{ color: INK_COLORS[grid.winner] }}
           aria-hidden="true"
         >
           <path
             d={strikePath}
             fill="none"
-            stroke={INK_COLORS[grid.winner]}
+            stroke="currentColor"
             strokeWidth={sizeVariant === 'focused' ? 3.8 : 4.6}
             strokeLinecap="round"
             opacity={0.92}
@@ -163,7 +164,7 @@ function PlayableCells({
                   aria-disabled={canPlay ? undefined : true}
                   onClick={() => canPlay && onCellClick?.(idx)}
                   aria-label={`Grid ${grid.id + 1}, row ${row + 1} column ${col + 1}${cell ? `, ${cell}` : ', empty'}`}
-                  className={`group relative flex flex-1 items-center justify-center p-[14%] transition-colors focus:outline-none focus-visible:rounded-md focus-visible:ring-2 focus-visible:ring-[#1c2b4a]/40 ${
+                  className={`group relative flex flex-1 items-center justify-center p-[14%] transition-colors focus:outline-hidden focus-visible:rounded-md focus-visible:ring-2 focus-visible:ring-[#1c2b4a]/40 ${
                     canPlay ? 'cursor-pointer hover:bg-[#24201b]/[0.035] active:scale-95' : 'cursor-default'
                   }`}
                 >
