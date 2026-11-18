@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { countMoves, getGridStatus, GRID_COUNT, type GridState } from '@/lib/game';
+import { countMoves, getGridStatus, GRID_COUNT, SHEET_COLUMNS, type GridState } from '@/lib/game';
 import {
   assignStarterIfUntouched,
   clearSheet,
@@ -20,6 +20,7 @@ import {
   playZoomOut,
   preloadPenSounds,
 } from '@/lib/sound';
+import { ROVING_ATTR, useRovingGrid } from '@/lib/useRovingGrid';
 import { FocusedGridOverlay } from './FocusedGridOverlay';
 import { NewSheetDialog } from './NewSheetDialog';
 import { ScoreBoard } from './ScoreBoard';
@@ -76,6 +77,7 @@ export function NotebookGame() {
   const [showNewSheetConfirm, setShowNewSheetConfirm] = useState(false);
 
   const cellRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const sheetNav = useRovingGrid(0);
   const flipTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -171,6 +173,11 @@ export function NotebookGame() {
   const hasSheetActivity = completedCount > 0 || inProgressCount > 0;
   const hasScore = score.X > 0 || score.O > 0 || score.ties > 0;
   const focusedGrid = focusedGridId !== null ? grids[focusedGridId] : null;
+  const sheetRows = useMemo(() => {
+    const rows: GridState[][] = [];
+    for (let i = 0; i < grids.length; i += SHEET_COLUMNS) rows.push(grids.slice(i, i + SHEET_COLUMNS));
+    return rows;
+  }, [grids]);
 
   const startNewPage = useCallback(() => {
     if (focusedGridId !== null) return;
@@ -274,8 +281,8 @@ export function NotebookGame() {
                 <button
                   type="button"
                   onClick={handleRequestNewPage}
-                  disabled={pageFlipping}
-                  className="cursor-pointer rounded-full border border-[#8e8474] bg-[#f8f5ec] px-3.5 py-1 text-sm font-medium text-[#24201b] shadow-xs transition hover:-translate-y-0.5 hover:border-[#24201b] hover:shadow-sm active:translate-y-0 disabled:cursor-default disabled:opacity-60 sm:text-base"
+                  aria-disabled={pageFlipping || undefined}
+                  className="cursor-pointer rounded-full border border-[#8e8474] bg-[#f8f5ec] px-3.5 py-1 text-sm font-medium text-[#24201b] shadow-xs transition hover:-translate-y-0.5 hover:border-[#24201b] hover:shadow-sm active:translate-y-0 aria-disabled:cursor-default aria-disabled:opacity-60 sm:text-base"
                 >
                   New Sheet
                 </button>
@@ -290,63 +297,75 @@ export function NotebookGame() {
             inProgressCount={inProgressCount}
           />
 
-          {/* 5 columns × 7 rows of hand-drawn tic-tac-toe grids */}
-          <div className="relative z-10 grid grid-cols-5 gap-2.5 sm:gap-4 md:gap-5">
-            {grids.map((grid) => {
-              const status = getGridStatus(grid);
-              const isFocused = focusedGridId === grid.id;
+          {/* 5 columns × 7 rows of hand-drawn tic-tac-toe grids: one Tab stop, arrow keys between grids */}
+          <div
+            role="grid"
+            aria-label={`Notebook sheet, ${GRID_COUNT} grids`}
+            className="relative z-10 flex flex-col gap-2.5 sm:gap-4 md:gap-5"
+            {...sheetNav.gridProps}
+          >
+            {sheetRows.map((row, rowIdx) => (
+              <div key={rowIdx} role="row" className="grid grid-cols-5 gap-2.5 sm:gap-4 md:gap-5">
+                {row.map((grid) => {
+                  const status = getGridStatus(grid);
+                  const isFocused = focusedGridId === grid.id;
 
-              return (
-                <button
-                  key={grid.id}
-                  type="button"
-                  onClick={() => handleSelectGrid(grid.id)}
-                  aria-label={describeGrid(grid)}
-                  className={`group relative rounded-lg p-1 transition-[transform,background-color] duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1c2b4a]/50 sm:p-1.5 ${
-                    isFocused
-                      ? 'pointer-events-none'
-                      : 'cursor-pointer hover:scale-[1.07] hover:bg-[#24201b]/[0.04] active:scale-[0.98]'
-                  } ${
-                    status === 'playing'
-                      ? 'ring-1 ring-dashed ring-[#8a7f6d]/60 bg-[#24201b]/[0.02]'
-                      : ''
-                  } ${
-                    grid.winner === 'X'
-                      ? 'bg-[#1c2b4a]/[0.035]'
-                      : grid.winner === 'O'
-                        ? 'bg-[#b3342b]/[0.035]'
-                        : status === 'draw'
-                          ? 'bg-[#24201b]/[0.025]'
-                          : ''
-                  }`}
-                >
-                  <div
-                    ref={(el) => {
-                      cellRefs.current[grid.id] = el;
-                    }}
-                    className={isFocused ? 'opacity-0' : undefined}
-                  >
-                    <TicTacToeBoard grid={grid} sizeVariant="mini" />
-                  </div>
+                  return (
+                    <div key={grid.id} role="gridcell">
+                      <button
+                        type="button"
+                        tabIndex={sheetNav.tabIndexFor(grid.id)}
+                        {...{ [ROVING_ATTR]: grid.id }}
+                        onClick={() => handleSelectGrid(grid.id)}
+                        aria-label={describeGrid(grid)}
+                        className={`group relative block w-full scroll-mt-32 rounded-lg p-1 transition-[transform,background-color] duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1c2b4a]/50 sm:p-1.5 ${
+                          isFocused
+                            ? 'pointer-events-none'
+                            : 'cursor-pointer hover:scale-[1.07] hover:bg-[#24201b]/[0.04] active:scale-[0.98]'
+                        } ${
+                          status === 'playing'
+                            ? 'ring-1 ring-dashed ring-[#8a7f6d]/60 bg-[#24201b]/[0.02]'
+                            : ''
+                        } ${
+                          grid.winner === 'X'
+                            ? 'bg-[#1c2b4a]/[0.035]'
+                            : grid.winner === 'O'
+                              ? 'bg-[#b3342b]/[0.035]'
+                              : status === 'draw'
+                                ? 'bg-[#24201b]/[0.025]'
+                                : ''
+                        }`}
+                      >
+                        <div
+                          ref={(el) => {
+                            cellRefs.current[grid.id] = el;
+                          }}
+                          className={isFocused ? 'opacity-0' : undefined}
+                        >
+                          <TicTacToeBoard grid={grid} sizeVariant="mini" />
+                        </div>
 
-                  {/* Subtle corner mark for in-progress or drawn grids */}
-                  {status === 'playing' && (
-                    <span
-                      className="absolute right-1 bottom-0.5 h-1.5 w-1.5 rounded-full bg-[#7a6f5d]/70"
-                      aria-hidden="true"
-                    />
-                  )}
-                  {status === 'draw' && (
-                    <span
-                      className="pointer-events-none absolute right-1 bottom-0 text-[10px] leading-none text-[#756c5f] sm:text-xs"
-                      aria-hidden="true"
-                    >
-                      –
-                    </span>
-                  )}
-                </button>
-              );
-            })}
+                        {/* Subtle corner mark for in-progress or drawn grids */}
+                        {status === 'playing' && (
+                          <span
+                            className="absolute right-1 bottom-0.5 h-1.5 w-1.5 rounded-full bg-[#7a6f5d]/70"
+                            aria-hidden="true"
+                          />
+                        )}
+                        {status === 'draw' && (
+                          <span
+                            className="pointer-events-none absolute right-1 bottom-0 text-[10px] leading-none text-[#756c5f] sm:text-xs"
+                            aria-hidden="true"
+                          >
+                            –
+                          </span>
+                        )}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
           </div>
         </section>
       </div>
