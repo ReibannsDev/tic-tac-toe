@@ -3,6 +3,7 @@
 import React, { useMemo } from 'react';
 import type { GridState, Player } from '@/lib/game';
 import { getHandGridGeometry, getWinStrikePath } from '@/lib/handdrawn';
+import { useRovingGrid, ROVING_ATTR } from '@/lib/useRovingGrid';
 import { HandMark, INK_COLORS } from './HandMark';
 
 interface TicTacToeBoardProps {
@@ -66,47 +67,17 @@ export function TicTacToeBoard({
       </svg>
 
       {/* 3x3 cells aligned with the inner # squares */}
-      <div className="absolute inset-[4%] grid grid-cols-3 grid-rows-3">
-        {grid.board.map((cell, idx) => {
-          const canPlay = interactive && !isFinished && cell === null;
-          const shouldAnimateMark = sizeVariant === 'focused' && lastPlayedCell === idx;
-
-          if (interactive) {
-            return (
-              <button
-                key={idx}
-                type="button"
-                disabled={!canPlay}
-                onClick={() => canPlay && onCellClick?.(idx)}
-                aria-label={`Grid ${grid.id + 1}, row ${Math.floor(idx / 3) + 1} column ${(idx % 3) + 1}${cell ? `, ${cell}` : ', empty'}`}
-                className={`group relative flex items-center justify-center p-[14%] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1c2b4a]/40 focus-visible:rounded-md ${
-                  canPlay ? 'cursor-pointer hover:bg-[#24201b]/[0.035] active:scale-95' : 'cursor-default'
-                }`}
-              >
-                {cell ? (
-                  <HandMark
-                    player={cell}
-                    gridId={grid.id}
-                    cellIndex={idx}
-                    animated={shouldAnimateMark}
-                    strokeWidth={markStrokeWidth}
-                  />
-                ) : canPlay ? (
-                  <span className="pointer-events-none h-full w-full opacity-0 transition-opacity duration-150 group-hover:opacity-100">
-                    <HandMark
-                      player={nextTurn}
-                      gridId={grid.id}
-                      cellIndex={idx}
-                      ghost
-                      strokeWidth={markStrokeWidth}
-                    />
-                  </span>
-                ) : null}
-              </button>
-            );
-          }
-
-          return (
+      {interactive && !isFinished ? (
+        <PlayableCells
+          grid={grid}
+          nextTurn={nextTurn}
+          lastPlayedCell={lastPlayedCell}
+          markStrokeWidth={markStrokeWidth}
+          onCellClick={onCellClick}
+        />
+      ) : (
+        <div className="absolute inset-[4%] grid grid-cols-3 grid-rows-3">
+          {grid.board.map((cell, idx) => (
             <div key={idx} className="relative flex items-center justify-center p-[15%]">
               {cell ? (
                 <HandMark
@@ -117,9 +88,9 @@ export function TicTacToeBoard({
                 />
               ) : null}
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Hand-drawn win strike-through line */}
       {strikePath && grid.winner ? (
@@ -140,6 +111,87 @@ export function TicTacToeBoard({
           />
         </svg>
       ) : null}
+    </div>
+  );
+}
+
+const ROWS = [0, 1, 2] as const;
+
+interface PlayableCellsProps {
+  grid: GridState;
+  nextTurn: Player;
+  lastPlayedCell: number | null;
+  markStrokeWidth: number;
+  onCellClick?: (cellIndex: number) => void;
+}
+
+/**
+ * The playable 3x3 as an ARIA grid: one Tab stop, arrow keys between cells.
+ * Taken cells stay focusable (aria-disabled, not disabled) so keyboard and
+ * screen reader users can move across them and hear what is there.
+ */
+function PlayableCells({
+  grid,
+  nextTurn,
+  lastPlayedCell,
+  markStrokeWidth,
+  onCellClick,
+}: PlayableCellsProps) {
+  const firstEmpty = grid.board.findIndex((cell) => cell === null);
+  const { tabIndexFor, gridProps } = useRovingGrid(firstEmpty === -1 ? 0 : firstEmpty);
+
+  return (
+    <div
+      role="grid"
+      aria-label={`Grid ${grid.id + 1} board`}
+      className="absolute inset-[4%] flex flex-col"
+      {...gridProps}
+    >
+      {ROWS.map((row) => (
+        <div key={row} role="row" className="grid flex-1 grid-cols-3">
+          {ROWS.map((col) => {
+            const idx = row * 3 + col;
+            const cell = grid.board[idx];
+            const canPlay = cell === null;
+
+            return (
+              <div key={col} role="gridcell" className="flex">
+                <button
+                  type="button"
+                  tabIndex={tabIndexFor(idx)}
+                  {...{ [ROVING_ATTR]: idx }}
+                  aria-disabled={canPlay ? undefined : true}
+                  onClick={() => canPlay && onCellClick?.(idx)}
+                  aria-label={`Grid ${grid.id + 1}, row ${row + 1} column ${col + 1}${cell ? `, ${cell}` : ', empty'}`}
+                  className={`group relative flex flex-1 items-center justify-center p-[14%] transition-colors focus:outline-none focus-visible:rounded-md focus-visible:ring-2 focus-visible:ring-[#1c2b4a]/40 ${
+                    canPlay ? 'cursor-pointer hover:bg-[#24201b]/[0.035] active:scale-95' : 'cursor-default'
+                  }`}
+                >
+                  {cell ? (
+                    <HandMark
+                      player={cell}
+                      gridId={grid.id}
+                      cellIndex={idx}
+                      animated={lastPlayedCell === idx}
+                      strokeWidth={markStrokeWidth}
+                    />
+                  ) : (
+                    <span className="pointer-events-none h-full w-full opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
+                      <HandMark
+                        player={nextTurn}
+                        gridId={grid.id}
+                        cellIndex={idx}
+                        ghost
+                        strokeWidth={markStrokeWidth}
+                      />
+                    </span>
+                  )}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      ))}
     </div>
   );
 }

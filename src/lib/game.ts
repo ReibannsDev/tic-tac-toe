@@ -24,6 +24,7 @@ export interface ScoreState {
 }
 
 export const GRID_COUNT = 35; // 5 columns × 7 rows, matching the notebook page
+export const SHEET_COLUMNS = 5;
 
 export const WINNING_LINES: readonly [number, number, number][] = [
   [0, 1, 2],

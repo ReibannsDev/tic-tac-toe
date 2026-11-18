@@ -19,6 +19,18 @@ body {
   min-height: 100dvh;
 }
 
+/* Keep scroll gestures over an open modal (or its backdrop) from scrolling the
+   page behind it. Progressive enhancement: browsers that only honour
+   overscroll-behavior on overflowing containers still make the page inert. */
+dialog:modal {
+  overscroll-behavior: contain;
+}
+
+dialog::backdrop {
+  overflow: hidden; /* ::backdrop is not a scroll container by default */
+  overscroll-behavior: contain;
+}
+
 /* Dotted notebook paper base color */
 .paper-sheet {
   background-color: var(--paper-cream);

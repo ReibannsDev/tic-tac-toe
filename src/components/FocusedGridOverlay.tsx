@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { getNextTurn, type GridState } from '@/lib/game';
-import { useFocusTrap } from '@/lib/useFocusTrap';
+import { ROVING_ATTR } from '@/lib/useRovingGrid';
 import { INK_COLORS } from './HandMark';
 import { TicTacToeBoard } from './TicTacToeBoard';
 
@@ -126,7 +126,7 @@ export function FocusedGridOverlay({
   onRequestClose,
   onCloseComplete,
 }: FocusedGridOverlayProps) {
-  const dialogRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
   const cardBgRef = useRef<HTMLDivElement>(null);
   const flyingBoardRef = useRef<HTMLDivElement>(null);
   const openBoardAnimRef = useRef<Animation | null>(null);
@@ -143,16 +143,45 @@ export function FocusedGridOverlay({
       ? 'Draw.'
       : `Player ${nextTurn}'s turn.`;
 
-  // Keep keyboard focus inside the dialog; the parent returns focus to the
-  // grid on the page once the closing animation has finished.
-  useFocusTrap(dialogRef, { restoreFocus: false });
+  // Where focus belongs: the board's current cell while playing, otherwise the
+  // main action ("Next empty grid", or "Back to page" when there is none).
+  const focusPreferred = useCallback(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    const target =
+      dialog.querySelector<HTMLElement>('[role="grid"] [tabindex="0"]') ??
+      dialog.querySelector<HTMLElement>('[data-primary-action]') ??
+      dialog;
+    target.focus({ preventScroll: true });
+  }, []);
 
-  // The focused control can disappear (the winning cell becomes disabled, or
-  // "Next empty grid" unmounts); pull focus back into the dialog when it does.
+  // Open as a native modal before the FLIP effect below measures the board.
+  // showModal() makes the page inert and contains focus; Esc arrives as `cancel`.
+  useLayoutEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog || dialog.open) return;
+    dialog.showModal();
+    focusPreferred();
+  }, [focusPreferred]);
+
+  // The focused control can disappear (the board stops being playable when the
+  // round ends, or "Next empty grid" unmounts); move focus to what comes next.
   useEffect(() => {
-    const el = dialogRef.current;
-    if (el && !el.contains(document.activeElement)) el.focus({ preventScroll: true });
-  }, [grid.id, isFinished]);
+    const dialog = dialogRef.current;
+    if (dialog && !dialog.contains(document.activeElement)) focusPreferred();
+  }, [grid.id, isFinished, focusPreferred]);
+
+  // Close the native dialog first so the page is no longer inert, then let the
+  // parent unmount us and focus the grid on the page. Runs once, whichever
+  // path gets here first (animation end, reduced motion, or a native close).
+  const closedRef = useRef(false);
+  const finishClose = useCallback(() => {
+    if (closedRef.current) return;
+    closedRef.current = true;
+    const dialog = dialogRef.current;
+    if (dialog?.open) dialog.close();
+    onCloseComplete();
+  }, [onCloseComplete]);
 
   // Reveal backdrop, top status pill, and bottom actions on mount (Strict Mode safe)
   useEffect(() => {
@@ -245,7 +274,7 @@ export function FocusedGridOverlay({
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     if (!boardEl || !bgEl || prefersReducedMotion) {
-      onCloseComplete();
+      finishClose();
       return;
     }
 
@@ -289,7 +318,7 @@ export function FocusedGridOverlay({
     let cancelled = false;
     closeBoardAnim.onfinish = () => {
       if (!cancelled) {
-        onCloseComplete();
+        finishClose();
       }
     };
 
@@ -298,29 +327,40 @@ export function FocusedGridOverlay({
       closeBoardAnim.cancel();
       closeBgAnim.cancel();
     };
-  }, [isClosing, getSourceRect, sourceRect, onCloseComplete]);
+  }, [isClosing, getSourceRect, sourceRect, finishClose]);
 
-  // Escape key closes/returns to the notebook page
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !isClosing) {
-        onRequestClose();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isClosing, onRequestClose]);
+  // Esc (or the Android back gesture) asks to close: run the zoom-out animation
+  // instead of letting the dialog vanish. If the browser makes a repeated
+  // request uncancelable, the dialog closes natively and `close` finishes up.
+  const handleCancel = (e: React.SyntheticEvent<HTMLDialogElement>) => {
+    e.preventDefault();
+    if (!isClosing) onRequestClose();
+  };
+
+  // 1-9 play the cells in reading order (1 = top left, 9 = bottom right)
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDialogElement>) => {
+    if (isFinished || isClosing || e.altKey || e.ctrlKey || e.metaKey) return;
+    if (!/^[1-9]$/.test(e.key)) return;
+    e.preventDefault();
+    const cellIndex = Number(e.key) - 1;
+    onCellClick(grid.id, cellIndex);
+    dialogRef.current
+      ?.querySelector<HTMLElement>(`[${ROVING_ATTR}="${cellIndex}"]`)
+      ?.focus({ preventScroll: true });
+  };
 
   const showChrome = entered && !isClosing;
 
   return (
-    <div
+    <dialog
       ref={dialogRef}
       tabIndex={-1}
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 outline-none"
-      role="dialog"
-      aria-modal="true"
+      onCancel={handleCancel}
+      onClose={finishClose}
+      onKeyDown={handleKeyDown}
       aria-label={`Tic-tac-toe grid #${grid.id + 1}`}
+      aria-keyshortcuts="1 2 3 4 5 6 7 8 9"
+      className="fixed inset-0 m-0 size-full max-h-none max-w-none flex-col items-center justify-center overflow-hidden bg-transparent p-4 text-[#24201b] outline-none open:flex backdrop:bg-transparent"
     >
       {/* Stable live region so every turn and result is announced (the visual pill remounts) */}
       <p className="sr-only" aria-live="polite" aria-atomic="true">
@@ -391,6 +431,7 @@ export function FocusedGridOverlay({
         {/* Exact square flying board matching the miniature board slot */}
         <div ref={flyingBoardRef} className="relative z-10 aspect-square w-full">
           <TicTacToeBoard
+            key={grid.id}
             grid={grid}
             interactive={!isFinished && !isClosing}
             nextTurn={nextTurn}
@@ -410,6 +451,7 @@ export function FocusedGridOverlay({
       >
         <button
           type="button"
+          data-primary-action={nextEmptyGridId === null || !isFinished ? '' : undefined}
           onClick={() => !isClosing && onRequestClose()}
           className="paper-sheet pointer-events-auto cursor-pointer rounded-full border border-[#c7beae] px-5 py-1.5 text-base font-medium text-[#3b352c] shadow-sm transition hover:-translate-y-0.5 hover:border-[#8f8574] hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#faf7f0] active:translate-y-0"
         >
@@ -423,6 +465,7 @@ export function FocusedGridOverlay({
         {isFinished && nextEmptyGridId !== null && (
           <button
             type="button"
+            data-primary-action=""
             onClick={() => !isClosing && onNextEmptyGrid()}
             className="pointer-events-auto cursor-pointer rounded-full border border-[#24201b] bg-[#24201b] px-5 py-1.5 text-base font-medium text-[#f8f5ec] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#38322a] hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#faf7f0] active:translate-y-0"
           >
@@ -430,6 +473,6 @@ export function FocusedGridOverlay({
           </button>
         )}
       </div>
-    </div>
+    </dialog>
   );
 }
