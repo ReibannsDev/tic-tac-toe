@@ -95,13 +95,13 @@ export function NewSheetDialog({
           <button
             ref={keepRef}
             value="cancel"
-            className="cursor-pointer rounded-full border border-[#c7beae] bg-[#f8f5ec] px-4 py-1.5 text-sm font-medium text-[#3b352c] transition hover:border-[#8f8574] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1c2b4a]/50 sm:text-base"
+            className="cursor-pointer rounded-full border border-[#8e8474] bg-[#f8f5ec] px-4 py-1.5 text-sm font-medium text-[#3b352c] transition hover:border-[#5c5346] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#1c2b4a]/50 sm:text-base"
           >
             Keep this sheet
           </button>
           <button
             value="confirm"
-            className="cursor-pointer rounded-full border border-[#b3342b] bg-[#b3342b] px-4 py-1.5 text-sm font-medium text-[#faf7f0] shadow-xs transition hover:bg-[#9c2b23] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1c2b4a]/50 sm:text-base"
+            className="cursor-pointer rounded-full border border-[#b3342b] bg-[#b3342b] px-4 py-1.5 text-sm font-medium text-[#faf7f0] shadow-xs transition hover:bg-[#9c2b23] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#1c2b4a]/50 sm:text-base"
           >
             Start new sheet
           </button>

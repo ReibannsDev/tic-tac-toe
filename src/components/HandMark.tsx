@@ -11,6 +11,11 @@ interface HandMarkProps {
   strokeWidth?: number;
 }
 
+/**
+ * Ink colours. Marks stroke with `currentColor` and set `color` to these, so in
+ * Windows High Contrast (forced colors) the browser swaps in the system text
+ * colour and the marks stay visible on any background.
+ */
 export const INK_COLORS: Record<Player, string> = {
   X: '#1c2b4a', // Deep fountain-pen navy/charcoal ink
   O: '#b3342b', // Warm crimson pen ink
@@ -32,12 +37,13 @@ export function HandMark({
       <svg
         viewBox="0 0 100 100"
         className={`h-full w-full overflow-visible ${ghost ? 'opacity-25' : ''}`}
+        style={{ color }}
         aria-hidden="true"
       >
         <path
           d={stroke1}
           fill="none"
-          stroke={color}
+          stroke="currentColor"
           strokeWidth={strokeWidth}
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -47,7 +53,7 @@ export function HandMark({
         <path
           d={stroke2}
           fill="none"
-          stroke={color}
+          stroke="currentColor"
           strokeWidth={strokeWidth}
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -63,12 +69,13 @@ export function HandMark({
     <svg
       viewBox="0 0 100 100"
       className={`h-full w-full overflow-visible ${ghost ? 'opacity-25' : ''}`}
+      style={{ color }}
       aria-hidden="true"
     >
       <path
         d={oPath}
         fill="none"
-        stroke={color}
+        stroke="currentColor"
         strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -94,18 +101,18 @@ export function HandSymbolIcon({
 
   if (player === 'X') {
     return (
-      <svg viewBox="0 0 100 100" className={className} aria-hidden="true">
+      <svg viewBox="0 0 100 100" className={className} style={{ color }} aria-hidden="true">
         <path
           d="M 22 22 Q 51 49 78 78"
           fill="none"
-          stroke={color}
+          stroke="currentColor"
           strokeWidth={11}
           strokeLinecap="round"
         />
         <path
           d="M 78 23 Q 49 51 22 78"
           fill="none"
-          stroke={color}
+          stroke="currentColor"
           strokeWidth={11}
           strokeLinecap="round"
         />
@@ -114,11 +121,11 @@ export function HandSymbolIcon({
   }
 
   return (
-    <svg viewBox="0 0 100 100" className={className} aria-hidden="true">
+    <svg viewBox="0 0 100 100" className={className} style={{ color }} aria-hidden="true">
       <path
         d="M 52 17 C 71 17 84 31 84 50 C 84 70 70 84 50 84 C 30 84 16 70 16 50 C 16 31 30 18 49 18"
         fill="none"
-        stroke={color}
+        stroke="currentColor"
         strokeWidth={11}
         strokeLinecap="round"
       />
