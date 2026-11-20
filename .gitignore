@@ -39,3 +39,6 @@ next-env.d.ts
 *.mp3
 
 /screenshots
+
+# local Claude Code config
+/.claude/
