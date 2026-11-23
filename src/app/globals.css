@@ -1,21 +1,104 @@
 @import "tailwindcss";
 
+/*
+ * Colour tokens. Day is the cream dotted notebook; night is the same notebook
+ * on a dark desk with gel-pen inks. Night applies when the device prefers dark
+ * (unless the player picked Day), or when the player picked Night. The choice
+ * is saved in the store and set as data-theme on <html> before first paint.
+ */
 :root {
-  --paper-cream: #f4f0e6;
-  --paper-dot: #c1baa9;
-  --desk-bg: #cfc7b8;
-  --ink-dark: #24201b;
+  color-scheme: light;
+  --desk: #cfc7b8;
+  --paper: #f4f0e6;
+  --paper-raised: #faf7f0; /* buttons and chips sitting on the paper */
+  --paper-under: #efeadd; /* the stacked sheets peeking out underneath */
+  --paper-under-2: #e9e3d5;
+  --paper-edge: #bfb5a3;
+  --dot: #bfb7a6;
+  --ink: #24201b; /* headings, grid lines, main text */
+  --ink-soft: #3b352c;
+  --muted: #5c5346;
+  --faint: #6b6255;
+  --line: #8e8474;
+  --line-soft: #cfc6b6;
+  --ink-x: #1c2b4a; /* deep fountain-pen navy */
+  --ink-o: #b3342b; /* warm crimson */
+  --ink-o-strong: #9c2b23;
+  --scrim: #2d2822;
+  --on-scrim: #faf7f0; /* focus rings drawn over the dimmed backdrop */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='day']) {
+    color-scheme: dark;
+    --desk: #131418;
+    --paper: #26282e;
+    --paper-raised: #33363d;
+    --paper-under: #222429;
+    --paper-under-2: #1e2025;
+    --paper-edge: #3a3d45;
+    --dot: rgb(255 255 255 / 0.13);
+    --ink: #ece6da;
+    --ink-soft: #d6cfc2;
+    --muted: #b9b1a4;
+    --faint: #a8a094;
+    --line: #6c6f78;
+    --line-soft: #3d4048;
+    --ink-x: #8ec5ff; /* ice-blue gel pen */
+    --ink-o: #ff8f7d; /* coral gel pen */
+    --ink-o-strong: #ffa799;
+    --scrim: #000000;
+    --on-scrim: #ece6da;
+  }
+}
+
+:root[data-theme='night'] {
+  color-scheme: dark;
+  --desk: #131418;
+  --paper: #26282e;
+  --paper-raised: #33363d;
+  --paper-under: #222429;
+  --paper-under-2: #1e2025;
+  --paper-edge: #3a3d45;
+  --dot: rgb(255 255 255 / 0.13);
+  --ink: #ece6da;
+  --ink-soft: #d6cfc2;
+  --muted: #b9b1a4;
+  --faint: #a8a094;
+  --line: #6c6f78;
+  --line-soft: #3d4048;
+  --ink-x: #8ec5ff;
+  --ink-o: #ff8f7d;
+  --ink-o-strong: #ffa799;
+  --scrim: #000000;
+  --on-scrim: #ece6da;
+}
+
+/* Expose the tokens as Tailwind colours: text-ink, bg-paper, border-line-soft… */
+@theme inline {
+  --color-desk: var(--desk);
+  --color-paper: var(--paper);
+  --color-paper-raised: var(--paper-raised);
+  --color-paper-under: var(--paper-under);
+  --color-paper-under-2: var(--paper-under-2);
+  --color-paper-edge: var(--paper-edge);
+  --color-dot: var(--dot);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-line-soft: var(--line-soft);
+  --color-ink-x: var(--ink-x);
+  --color-ink-o: var(--ink-o);
+  --color-ink-o-strong: var(--ink-o-strong);
+  --color-scrim: var(--scrim);
+  --color-on-scrim: var(--on-scrim);
 }
 
 body {
-  background-color: var(--desk-bg);
-  background-image: radial-gradient(
-    ellipse at 50% 25%,
-    #ddd6c8 0%,
-    #cbc2b2 65%,
-    #bdb3a2 100%
-  );
-  color: var(--ink-dark);
+  background-color: var(--desk);
+  color: var(--ink);
   min-height: 100dvh;
 }
 
@@ -33,11 +116,11 @@ dialog::backdrop {
 
 /* Dotted notebook paper base color */
 .paper-sheet {
-  background-color: var(--paper-cream);
+  background-color: var(--paper);
 }
 
 .paper-dots {
-  background-image: radial-gradient(circle, #bfb7a6 1px, transparent 1.1px);
+  background-image: radial-gradient(circle, var(--dot) 1px, transparent 1.1px);
   background-size: 18px 18px;
 }
 

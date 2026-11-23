@@ -1,13 +1,15 @@
 'use client';
 
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { getNextTurn, type GridState } from '@/lib/game';
+import { getNextTurn, type GridState, type Player } from '@/lib/game';
+import { playerLabel } from '@/lib/notebookStore';
 import { ROVING_ATTR } from '@/lib/useRovingGrid';
 import { INK_COLORS } from './HandMark';
 import { TicTacToeBoard } from './TicTacToeBoard';
 
 interface FocusedGridOverlayProps {
   grid: GridState;
+  playerNames: Record<Player, string>;
   sourceRect: DOMRect;
   getSourceRect: () => DOMRect | null;
   lastPlayedCell: number | null;
@@ -51,8 +53,8 @@ const DRAW_TICKS: readonly SparkSpec[] = [
 ];
 
 function RoundEndBurst({ winner }: { winner: GridState['winner'] }) {
-  const color = winner ? INK_COLORS[winner] : '#756c5f';
-  const accent = winner ? '#c7923e' : '#9c9282';
+  const color = winner ? INK_COLORS[winner] : 'var(--faint)';
+  const accent = winner ? '#c7923e' : 'var(--faint)'; // gold reads on both papers
   const specs = winner ? WIN_SPARKS : DRAW_TICKS;
 
   return (
@@ -125,6 +127,7 @@ export function FocusedGridOverlay({
   onNextEmptyGrid,
   onRequestClose,
   onCloseComplete,
+  playerNames,
 }: FocusedGridOverlayProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const cardBgRef = useRef<HTMLDivElement>(null);
@@ -137,11 +140,13 @@ export function FocusedGridOverlay({
   const isFinished = Boolean(grid.winner || grid.isDraw);
   const justFinishedNow = isFinished && !wasFinishedOnOpen;
   const nextTurn = getNextTurn(grid);
+  const winnerLabel = grid.winner ? playerLabel(playerNames, grid.winner) : '';
+  const turnLabel = playerLabel(playerNames, nextTurn);
   const statusText = grid.winner
-    ? `Player ${grid.winner} wins!`
+    ? `${winnerLabel} wins!`
     : grid.isDraw
       ? 'Draw.'
-      : `Player ${nextTurn}'s turn.`;
+      : `${turnLabel}'s turn.`;
 
   // Where focus belongs: the board's current cell while playing, otherwise the
   // main action ("Next empty grid", or "Back to page" when there is none).
@@ -360,7 +365,7 @@ export function FocusedGridOverlay({
       onKeyDown={handleKeyDown}
       aria-label={`Tic-tac-toe grid #${grid.id + 1}`}
       aria-keyshortcuts="1 2 3 4 5 6 7 8 9"
-      className="fixed inset-0 m-0 size-full max-h-none max-w-none flex-col items-center justify-center overflow-hidden bg-transparent p-4 text-[#24201b] outline-none open:flex backdrop:bg-transparent"
+      className="fixed inset-0 m-0 size-full max-h-none max-w-none flex-col items-center justify-center overflow-hidden bg-transparent p-4 text-ink outline-none open:flex backdrop:bg-transparent"
     >
       {/* Stable live region so every turn and result is announced (the visual pill remounts) */}
       <p className="sr-only" aria-live="polite" aria-atomic="true">
@@ -370,7 +375,7 @@ export function FocusedGridOverlay({
       {/* Dimmed backdrop showing surrounding grids softly underneath */}
       <div
         onClick={() => !isClosing && onRequestClose()}
-        className={`absolute inset-0 bg-[#2d2822]/35 backdrop-blur-[2px] transition-opacity duration-250 ${
+        className={`absolute inset-0 bg-scrim/35 backdrop-blur-[2px] transition-opacity duration-250 ${
           showChrome ? 'opacity-100' : 'opacity-0'
         }`}
       />
@@ -383,23 +388,23 @@ export function FocusedGridOverlay({
       >
         <div
           key={`${grid.id}-${grid.winner ?? (grid.isDraw ? 'draw' : 'play')}`}
-          className={`paper-sheet pointer-events-auto rounded-full border border-[#cfc7b8] px-5 py-1.5 shadow-md ${
+          className={`paper-sheet pointer-events-auto rounded-full border border-line-soft px-5 py-1.5 shadow-md ${
             justFinishedNow ? 'animate-result-pop' : ''
           }`}
           aria-hidden="true"
         >
           <div className="flex items-center gap-2.5 text-lg font-semibold tracking-wide sm:text-xl">
-            <span className="text-sm text-[#6b6255]">#{grid.id + 1}</span>
-            <span className="text-[#c5bdb0]">•</span>
+            <span className="text-sm text-faint">#{grid.id + 1}</span>
+            <span className="text-line-soft">•</span>
             {grid.winner ? (
               <span style={{ color: INK_COLORS[grid.winner] }}>
-                Player {grid.winner} wins!
+                {winnerLabel} wins!
               </span>
             ) : grid.isDraw ? (
-              <span className="text-[#5c5346]">Draw — Cat&apos;s game!</span>
+              <span className="text-muted">Draw — Cat&apos;s game!</span>
             ) : (
               <span style={{ color: INK_COLORS[nextTurn] }}>
-                Player {nextTurn}&apos;s turn
+                {turnLabel}&apos;s turn
               </span>
             )}
           </div>
@@ -424,7 +429,7 @@ export function FocusedGridOverlay({
         {/* Card paper backing that fades cleanly as the grid returns */}
         <div
           ref={cardBgRef}
-          className="paper-sheet paper-dots pointer-events-none absolute inset-0 rounded-xl border border-[#d3cbbd] shadow-[0_24px_55px_rgba(35,28,20,0.32),0_4px_14px_rgba(35,28,20,0.16)]"
+          className="paper-sheet paper-dots pointer-events-none absolute inset-0 rounded-xl border border-line-soft shadow-[0_24px_55px_rgba(35,28,20,0.32),0_4px_14px_rgba(35,28,20,0.16)]"
           aria-hidden="true"
         />
 
@@ -453,7 +458,7 @@ export function FocusedGridOverlay({
           type="button"
           data-primary-action={nextEmptyGridId === null || !isFinished ? '' : undefined}
           onClick={() => !isClosing && onRequestClose()}
-          className="paper-sheet pointer-events-auto cursor-pointer rounded-full border border-[#8e8474] px-5 py-1.5 text-base font-medium text-[#3b352c] shadow-sm transition hover:-translate-y-0.5 hover:border-[#5c5346] hover:shadow-md focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#faf7f0] active:translate-y-0"
+          className="paper-sheet pointer-events-auto cursor-pointer rounded-full border border-line px-5 py-1.5 text-base font-medium text-ink-soft shadow-sm transition hover:-translate-y-0.5 hover:border-muted hover:shadow-md focus:outline-hidden focus-visible:ring-2 focus-visible:ring-on-scrim active:translate-y-0"
         >
           {isFinished ? 'Back to page' : 'Pause & back to page'}
         </button>
@@ -463,7 +468,7 @@ export function FocusedGridOverlay({
             type="button"
             data-primary-action=""
             onClick={() => !isClosing && onNextEmptyGrid()}
-            className="pointer-events-auto cursor-pointer rounded-full border border-[#24201b] bg-[#24201b] px-5 py-1.5 text-base font-medium text-[#f8f5ec] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#38322a] hover:shadow-md focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#faf7f0] active:translate-y-0"
+            className="pointer-events-auto cursor-pointer rounded-full border border-ink bg-ink px-5 py-1.5 text-base font-medium text-paper-raised shadow-sm transition hover:-translate-y-0.5 hover:bg-ink-soft hover:shadow-md focus:outline-hidden focus-visible:ring-2 focus-visible:ring-on-scrim active:translate-y-0"
           >
             Next empty grid (#{nextEmptyGridId + 1}) →
           </button>

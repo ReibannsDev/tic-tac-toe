@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createPageGrids, GRID_COUNT } from './game';
-import { createDefaultState, parseStoredState } from './notebookStore';
+import { createDefaultState, normalizeName, parseStoredState, playerLabel } from './notebookStore';
 
 const validPayload = () => JSON.parse(JSON.stringify(createDefaultState()));
 
@@ -53,6 +53,40 @@ describe('parseStoredState', () => {
     delete data.soundEnabled;
     expect(parseStoredState(JSON.stringify(data))?.soundEnabled).toBe(true);
   });
+
+  it('loads older saves without player names', () => {
+    const data = validPayload();
+    delete data.playerNames;
+    expect(parseStoredState(JSON.stringify(data))?.playerNames).toEqual({ X: '', O: '' });
+  });
+
+  it('defaults the theme to the system setting when missing or unknown', () => {
+    const data = validPayload();
+    delete data.theme;
+    expect(parseStoredState(JSON.stringify(data))?.theme).toBe('system');
+    data.theme = 'sepia';
+    expect(parseStoredState(JSON.stringify(data))?.theme).toBe('system');
+    data.theme = 'night';
+    expect(parseStoredState(JSON.stringify(data))?.theme).toBe('night');
+  });
+
+  it('cleans stored names instead of rejecting the save', () => {
+    const data = validPayload();
+    data.playerNames = { X: '  Maya   Lee ', O: 42 };
+    expect(parseStoredState(JSON.stringify(data))?.playerNames).toEqual({ X: 'Maya Lee', O: '' });
+  });
+});
+
+describe('player names', () => {
+  it('normalizes whitespace and caps the length', () => {
+    expect(normalizeName('  Sam  ')).toBe('Sam');
+    expect(normalizeName('a'.repeat(30))).toHaveLength(20);
+  });
+
+  it('falls back to the default label for a blank name', () => {
+    expect(playerLabel({ X: 'Maya', O: '' }, 'X')).toBe('Maya');
+    expect(playerLabel({ X: 'Maya', O: '' }, 'O')).toBe('Player O');
+  });
 });
 
 describe('store actions', () => {
@@ -98,5 +132,17 @@ describe('store actions', () => {
     store.resetScore();
     expect(store.getNotebookState().score).toEqual({ X: 0, O: 0, ties: 0 });
     expect(store.getNotebookState().nextStarter).toBe('X');
+  });
+
+  it('keeps player names through a new sheet and a score reset', async () => {
+    const store = await import('./notebookStore');
+    store.setPlayerName('X', '  Maya ');
+    store.setPlayerName('O', 'Sam');
+    store.clearSheet();
+    store.resetScore();
+    expect(store.getNotebookState().playerNames).toEqual({ X: 'Maya', O: 'Sam' });
+
+    store.setPlayerName('O', '   ');
+    expect(store.getNotebookState().playerNames.O).toBe('');
   });
 });

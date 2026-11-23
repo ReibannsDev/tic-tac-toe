@@ -74,18 +74,18 @@ export function NewSheetDialog({
       aria-describedby="new-sheet-confirm-desc"
       onClose={handleClose}
       {...fallbackLightDismiss}
-      className="paper-sheet paper-dots m-auto w-[calc(100%-2rem)] max-w-sm rounded-xl border border-[#cfc6b6] p-5 text-[#24201b] shadow-[0_20px_50px_rgba(35,28,20,0.3)] backdrop:bg-[#2d2822]/35 backdrop:backdrop-blur-[2px] sm:p-6"
+      className="paper-sheet paper-dots m-auto w-[calc(100%-2rem)] max-w-sm rounded-xl border border-line-soft p-5 text-ink shadow-[0_20px_50px_rgba(35,28,20,0.3)] backdrop:bg-scrim/35 backdrop:backdrop-blur-[2px] sm:p-6"
     >
-      <div className="rounded-lg border border-dashed border-[#c7beae] bg-[#faf7f0]/75 p-4">
+      <div className="rounded-lg border border-dashed border-line-soft bg-paper-raised/75 p-4">
         <h2
           id="new-sheet-confirm-title"
-          className="font-[family-name:var(--font-hand-display)] text-2xl font-bold text-[#24201b]"
+          className="font-[family-name:var(--font-hand-display)] text-2xl font-bold text-ink"
         >
           Start a fresh sheet?
         </h2>
         <p
           id="new-sheet-confirm-desc"
-          className="mt-2 text-sm leading-relaxed text-[#574f43] sm:text-base"
+          className="mt-2 text-sm leading-relaxed text-muted sm:text-base"
         >
           This will clear all {GRID_COUNT} grids on the current sheet ({completedCount} finished
           {inProgressCount > 0 ? `, ${inProgressCount} in play` : ''}). Your scoreboard will stay
@@ -95,13 +95,13 @@ export function NewSheetDialog({
           <button
             ref={keepRef}
             value="cancel"
-            className="cursor-pointer rounded-full border border-[#8e8474] bg-[#f8f5ec] px-4 py-1.5 text-sm font-medium text-[#3b352c] transition hover:border-[#5c5346] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#1c2b4a]/50 sm:text-base"
+            className="cursor-pointer rounded-full border border-line bg-paper-raised px-4 py-1.5 text-sm font-medium text-ink-soft transition hover:border-muted focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ink-x/50 sm:text-base"
           >
             Keep this sheet
           </button>
           <button
             value="confirm"
-            className="cursor-pointer rounded-full border border-[#b3342b] bg-[#b3342b] px-4 py-1.5 text-sm font-medium text-[#faf7f0] shadow-xs transition hover:bg-[#9c2b23] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#1c2b4a]/50 sm:text-base"
+            className="cursor-pointer rounded-full border border-ink-o bg-ink-o px-4 py-1.5 text-sm font-medium text-paper-raised shadow-xs transition hover:bg-ink-o-strong focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ink-x/50 sm:text-base"
           >
             Start new sheet
           </button>
