@@ -13,6 +13,10 @@ import {
   type Player,
   type ScoreState,
 } from './game';
+import { STORAGE_KEY } from './storageKey';
+import { isThemePreference, type ThemePreference } from './theme';
+
+export type { ThemePreference };
 
 /**
  * The notebook's persistent state (grids, score, starter rotation, sound
@@ -25,9 +29,26 @@ export interface NotebookState {
   score: ScoreState;
   nextStarter: Player;
   soundEnabled: boolean;
+  /** Custom names; an empty string means "use the default label". */
+  playerNames: Record<Player, string>;
+  /** 'system' follows the device's light/dark setting. */
+  theme: ThemePreference;
 }
 
-export const STORAGE_KEY = 'paper-tictactoe-state-v1';
+
+export const MAX_NAME_LENGTH = 20;
+
+/** Trims, collapses inner whitespace and caps a typed name at MAX_NAME_LENGTH. */
+export function normalizeName(raw: string): string {
+  return raw.replace(/\s+/g, ' ').trim().slice(0, MAX_NAME_LENGTH).trim();
+}
+
+/** The name shown for a player: their custom name, or "Player X" / "Player O". */
+export function playerLabel(names: Record<Player, string>, player: Player): string {
+  return names[player] || `Player ${player}`;
+}
+
+export { STORAGE_KEY };
 
 export function createDefaultState(): NotebookState {
   return {
@@ -35,6 +56,8 @@ export function createDefaultState(): NotebookState {
     score: { X: 0, O: 0, ties: 0 },
     nextStarter: 'X',
     soundEnabled: true,
+    playerNames: { X: '', O: '' },
+    theme: 'system',
   };
 }
 
@@ -48,6 +71,13 @@ const isPlayer = (v: unknown): v is Player => v === 'X' || v === 'O';
 const isCell = (v: unknown): v is CellValue => v === null || isPlayer(v);
 const isCount = (v: unknown): v is number =>
   typeof v === 'number' && Number.isInteger(v) && v >= 0;
+
+/** Names are optional (older saves have none); anything unusable falls back to empty. */
+function parseNames(raw: unknown): Record<Player, string> {
+  const names = typeof raw === 'object' && raw !== null ? (raw as Record<string, unknown>) : {};
+  const pick = (v: unknown) => (typeof v === 'string' ? normalizeName(v) : '');
+  return { X: pick(names.X), O: pick(names.O) };
+}
 
 /**
  * Rebuilds one grid from its stored board. Winner, win line and draw flag are
@@ -89,7 +119,10 @@ export function parseStoredState(raw: string | null): NotebookState | null {
     return null;
   }
   if (typeof data !== 'object' || data === null) return null;
-  const { grids, score, nextStarter, soundEnabled } = data as Record<string, unknown>;
+  const { grids, score, nextStarter, soundEnabled, playerNames, theme } = data as Record<
+    string,
+    unknown
+  >;
 
   if (!Array.isArray(grids) || grids.length !== GRID_COUNT) return null;
   const parsedGrids: GridState[] = [];
@@ -110,6 +143,8 @@ export function parseStoredState(raw: string | null): NotebookState | null {
     score: { X, O, ties },
     nextStarter,
     soundEnabled: typeof soundEnabled === 'boolean' ? soundEnabled : true,
+    playerNames: parseNames(playerNames),
+    theme: isThemePreference(theme) ? theme : 'system',
   };
 }
 
@@ -224,3 +259,16 @@ export function setSoundEnabled(enabled: boolean): void {
   if (storeState.soundEnabled === enabled) return;
   setState({ ...storeState, soundEnabled: enabled });
 }
+
+/** Saves a player's name; a blank name goes back to the default label. */
+export function setPlayerName(player: Player, name: string): void {
+  const normalized = normalizeName(name);
+  if (storeState.playerNames[player] === normalized) return;
+  setState({ ...storeState, playerNames: { ...storeState.playerNames, [player]: normalized } });
+}
+
+export function setThemePreference(theme: ThemePreference): void {
+  if (storeState.theme === theme) return;
+  setState({ ...storeState, theme });
+}
+

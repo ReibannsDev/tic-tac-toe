@@ -4,16 +4,13 @@ A two-player tic-tac-toe game drawn on a dotted notebook sheet: a page of hand-d
 
 **Live app:** https://tic-tac-toe-ivory-alpha-45.vercel.app
 
-<!-- Add a screenshot at docs/screenshot.png and uncomment:
-![Paper Tic-Tac-Toe](docs/screenshot.png)
--->
-
 ## How to play
 
 1. Tap any grid on the sheet to zoom in on it. With a keyboard, Tab to the sheet, use the arrow keys to pick a grid and press Enter.
 2. Players take turns placing **X** and **O** (by tapping, with arrow keys and Enter, or with keys 1–9 from top left to bottom right). The banner shows whose turn it is, then who won or that it's a draw.
 3. When a round ends, choose **Next empty grid →** to start a new game, or go back to the sheet.
-4. **New Sheet** clears every grid for a fresh start. The scoreboard keeps counting wins and draws until you press **Reset score**.
+4. **New Sheet** clears every grid for a fresh start. The scoreboard keeps counting wins and draws until you press **Reset score**. Tap the pencil next to a player to write their name.
+5. The sheet follows your device's light or dark setting. Tap **Day** / **Night** to switch; picking the same look as your device goes back to following it.
 
 Who starts alternates after every finished round, so neither player always gets the first move. Everything is saved in your browser, so a reload picks up where you left off.
 

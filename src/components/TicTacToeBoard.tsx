@@ -49,7 +49,7 @@ export function TicTacToeBoard({
       {/* Hand-drawn # grid lines */}
       <svg
         viewBox="0 0 100 100"
-        className="pointer-events-none absolute inset-0 h-full w-full overflow-visible text-[#24201b]"
+        className="pointer-events-none absolute inset-0 h-full w-full overflow-visible text-ink"
         aria-hidden="true"
       >
         {geometry.lines.map((d, idx) => (
@@ -164,8 +164,8 @@ function PlayableCells({
                   aria-disabled={canPlay ? undefined : true}
                   onClick={() => canPlay && onCellClick?.(idx)}
                   aria-label={`Grid ${grid.id + 1}, row ${row + 1} column ${col + 1}${cell ? `, ${cell}` : ', empty'}`}
-                  className={`group relative flex flex-1 items-center justify-center p-[14%] transition-colors focus:outline-hidden focus-visible:rounded-md focus-visible:ring-2 focus-visible:ring-[#1c2b4a]/40 ${
-                    canPlay ? 'cursor-pointer hover:bg-[#24201b]/[0.035] active:scale-95' : 'cursor-default'
+                  className={`group relative flex flex-1 items-center justify-center p-[14%] transition-colors focus:outline-hidden focus-visible:rounded-md focus-visible:ring-2 focus-visible:ring-ink-x/40 ${
+                    canPlay ? 'cursor-pointer hover:bg-ink/[0.035] active:scale-95' : 'cursor-default'
                   }`}
                 >
                   {cell ? (

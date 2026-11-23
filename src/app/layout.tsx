@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Caveat, Patrick_Hand } from 'next/font/google';
+import { THEME_BOOT_SCRIPT } from '@/lib/theme';
 import './globals.css';
 
 const patrickHand = Patrick_Hand({
@@ -36,8 +37,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${patrickHand.variable} ${caveat.variable}`}>
-      <body className="font-[family-name:var(--font-hand)] antialiased selection:bg-[#1c2b4a]/15">
+    // data-theme is set by the boot script before React hydrates
+    <html lang="en" className={`${patrickHand.variable} ${caveat.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+      </head>
+      <body className="font-[family-name:var(--font-hand)] antialiased selection:bg-ink-x/15">
         {children}
       </body>
     </html>

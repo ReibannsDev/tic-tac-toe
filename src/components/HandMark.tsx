@@ -17,8 +17,8 @@ interface HandMarkProps {
  * colour and the marks stay visible on any background.
  */
 export const INK_COLORS: Record<Player, string> = {
-  X: '#1c2b4a', // Deep fountain-pen navy/charcoal ink
-  O: '#b3342b', // Warm crimson pen ink
+  X: 'var(--ink-x)', // Navy fountain pen by day, ice-blue gel pen at night
+  O: 'var(--ink-o)', // Crimson by day, coral gel pen at night
 };
 
 export function HandMark({
